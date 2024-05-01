@@ -4,13 +4,18 @@ services:
   - docker
 
 before_install:
-  - docker build -t client-test-img -f ./client/Dockerfile.dev ./client
+  - docker build -t client-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true client-test-img npm test
+  - docker run -e CI=true client-test npm test
 
 after_success:
-  - docker build -t felipeemerson/client-img ./client
-  - docker build -t felipeemerson/worker-img ./worker
-  - docker build -t felipeemerson/server-img ./server
-  - docker build -t felipeemerson/nginx-img ./nginx
+  - docker build -t felipeemerson/multi-client ./client
+  - docker build -t felipeemerson/multi-worker ./worker
+  - docker build -t felipeemerson/multi-server ./server
+  - docker build -t felipeemerson/multi-nginx ./nginx
+  - echo "$DOCKER_HUB_PASSWORD" | docker login --username "$DOCKER_HUB_USER" --password-stdin
+  - docker push felipeemerson/multi-client
+  - docker push felipeemerson/multi-worker
+  - docker push felipeemerson/multi-server
+  - docker push felipeemerson/multi-nginx
